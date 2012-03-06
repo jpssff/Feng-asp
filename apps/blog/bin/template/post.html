@@ -1,0 +1,39 @@
+<dl>
+    <dt><a href="?r=blog&a=view&id=<%=post.id%>"><%=post.title%></a></dt>
+    <dd class="adoc">
+		<div style="font-size:12px;">
+            <%if (post.tags.length && post.tags[0].length){%>
+            标签 » 
+			<%post.tags.forEach(function(v, i){%>
+            <a class="a-tag" href="?r=blog&a=cate&c=<%=v%>"><%=tagNames[v]%></a>
+            <%});%>
+            <%}%>
+            创建时间 » 
+            <span class="mar"><%=F.date.toISOString(new Date(post.create_time*1000))%></span>
+			<a class="mar" href="?r=blog&a=view&id=<%=post.id%>#comment">评论</a>
+			<% if (is_login){ %>
+			<a href="?r=admin&a=edit&id=<%=post.id%>">[编辑]</a>
+			<% } %>
+        </div>
+        <div class="clearfix"><%=post.content%></div>
+        <%if(is_view){%>
+        <div class="clearfix share mat">
+            <div id="ckepop">
+                <span class="jiathis_txt">分享到：</span>
+                <a class="jiathis_button_icons_1"></a>
+                <a class="jiathis_button_icons_2"></a>
+                <a class="jiathis_button_icons_3"></a>
+                <a class="jiathis_button_icons_4"></a>
+                <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+                <a class="jiathis_counter_style"></a>
+            </div>
+        </div>
+        <%}else{%>
+        <div class="clearfix">
+			<a class="mar" href="?r=blog&a=view&id=<%=post.id%>#comment">评论</a>
+            <a href="?r=blog&a=view&id=<%=post.id%>">查看详情 » </a>
+        </div>
+        <%}%>
+    </dd>
+</dl>
+

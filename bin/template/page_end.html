@@ -1,0 +1,20 @@
+</div>
+<div id="foot">
+    <div class="inner">
+        <div class="container">
+            &copy;<%=new Date().getFullYear()%> wifeng.cn
+            <a class="right gotop" href="#">[到顶部]</a>
+           <br>
+            <a target="_blank" href="http://www.miibeian.gov.cn">京ICP备10027918号</a>
+        </div>
+    </div>
+</div>
+</body>
+<%if (DEBUG_MODE){%>
+<div class="tip">
+    <h2>调试信息：</h2>
+    <p>页面执行时间：<%=new Date().getTime()-START%>ms</p>
+    <pre>页面缓存：<br><%F.cache.each(function(i, v){print('【'+i+'】:' + F.encodeHTML(F.formatJSON(v.slice(0,200)))+'<hr>');});%></pre>
+</div>
+<%}%>
+</html>

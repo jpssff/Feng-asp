@@ -1,0 +1,145 @@
+<!--#include file="page_start.html"-->
+<script type="text/javascript">
+    window.initPath = String(<%=F.json.stringify(path)%>).toLowerCase();
+</script>
+<style type="text/css">
+    #file_manager ul{margin-left:0;}
+    #file_manager li{cursor:pointer;margin-top:3px;list-style:none;}
+    #file_manager li:hover{background:#ddd;}
+    #forder_list li{color:blue;}
+    #file_list .btn, #forder_list .btn{font-size:12px;padding:0 3px;margin:0 2px;}
+    .content{width:900px;height:500px;}
+</style>
+<dl>
+    <dt>文件管理</dt>
+    <dd id="file_manager">
+        <ul id="forder_list"></ul>
+        <ul id="file_list"></ul>
+        <div>
+            <div style="margin-top:10px;"><textarea name="content" id="code" class="content"></textarea></div>
+            <div id="file_path"></div>
+            <div><input class="btn primary" id="submit" type="submit" value="提交" /></div>
+        </div>
+    </dd>
+</dl>
+<script type="text/javascript">
+    $(function(){
+        var $folder = $('#forder_list');
+        var $file = $('#file_list');
+        $('li', $folder).live('click', function(e){
+            var t = $(e.target);
+            var path = $('.path', this).html().toLowerCase();
+            var parentPath = path === window.initPath ? path : path.slice(0, path.lastIndexOf('\\'));
+            if(t.is('.remove')){
+                if(window.confirm('确定要删除'+path+'?')){
+                    $.post('?r=admin&a=file&type=folder&action=remove&path='+path, function(data){
+                        if(data.status === 0){
+                            $.tip('删除成功');
+                            list(parentPath);
+                        }else{
+                            alert('删除失败:' + data.msg);
+                        }
+                    }, 'json');
+                }
+            }else if(t.is('.create_file') || t.is('.create_folder')){
+                var name = window.prompt('输入名称');
+                var type = t.is('.create_file') ? 'file' : 'folder';
+                if(name !== null && name !== ''){
+                    $.post('?r=admin&a=file&type='+type+'&action=create&path='+path,{
+                            name:name
+                        }, function(data){
+                        if(data.status === 0){
+                            $.tip('创建成功');
+                            list(parentPath);
+                        }else{
+                            alert('创建失败:' + data.msg);
+                        }
+                    }, 'json');
+                }
+            }else{
+                list(path);
+            }
+        });
+        $('li', $file).live('click', function(e){
+            var t = $(e.target);
+            var path = $('.path', this).html().toLowerCase();
+            var parentPath = path === window.initPath ? path : path.slice(0, path.lastIndexOf('\\'));
+            if(t.is('.remove')){
+                if(window.confirm('确定要删除'+path+'?')){
+                    $.post('?r=admin&a=file&type=file&action=remove&path='+path, function(data){
+                        if(data.status === 0){
+                            $.tip('删除成功');
+                            list(parentPath);
+                        }else{
+                            alert('删除失败');
+                        }
+                    }, 'json');
+                }
+            }else{
+                $.get('?r=admin&a=file&type=file&path=' + path, function(data){
+                    edit(path, data.content);
+                },'json');
+            }
+        });
+        function list(path){
+            path = path || '.';
+            $.get('?r=admin&a=file&path=' + path, function(data){
+                var folders = data.folders;
+                var files = data.files;
+                $folder.empty().append(item({path:(path===window.initPath ? 
+                    path : path.slice(0, path.lastIndexOf('\\')))}, 1));
+                $.each(folders, function(i, v){
+                    $folder.append(item(v, 1));
+                });
+                $file.empty();
+                $.each(files, function(i, v){
+                    $file.append(item(v));
+                });
+            }, 'json');
+        }
+
+        function item(v, type){
+            return [
+                '<li>',
+                '<button class="btn remove">删除</button>',
+                type ? '<button class="btn create_folder">新目录</button>' : '',
+                type ? '<button class="btn create_file">新文件</button>' : '',
+                '<span class="path">',v.path,'</span>',
+                '</li>'
+            ].join('');
+        }
+
+        function edit(path, data){
+            $('#code').val(data);
+            $('#file_path').html(path);
+            $('#submit').unbind().click(function(){
+                $.post('?r=admin&a=file&path='+path, {
+                    content:$('#code').val()
+                }, function(data){
+                    if(data.status === 0){
+                        $.tip('保存成功');
+                    }else{
+                        alert('保存失败:' + data.msg);
+                    }
+                }, 'json');
+            });
+        }
+        list(window.initPath);
+    });
+</script>
+<script src="js/jquery.selection.js" type="text/javascript"></script>
+<script src="js/jquery.coder.js" type="text/javascript"></script>
+<script src="js/jquery.snippets.html.js" type="text/javascript"></script>
+<script src="js/jquery.snippets.markdown.js" type="text/javascript"></script>
+<script src="js/jquery.dictionary.js" type="text/javascript"></script>
+<script type="text/javascript">
+    $(function(){
+        $('.content').coder({fileType:'html',keyHandler: {
+            'Ctrl-S': function($this, selection){
+                $('#submit').click();
+                return false;
+            }
+        }});
+    });
+</script>
+<!--#include file="page_end.html"-->

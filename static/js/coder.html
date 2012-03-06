@@ -1,0 +1,22 @@
+<!DOCTYPE html> 
+<html> 
+<head><!--STATUS OK--> 
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"> 
+<title>js coder</title> 
+<script src="jquery.js" type="text/javascript"></script> 
+<script src="jquery.selection.js" type="text/javascript"></script> 
+<script src="jquery.coder.js" type="text/javascript"></script> 
+<script src="jquery.snippets.html.js" type="text/javascript"></script> 
+<script src="jquery.snippets.markdown.js" type="text/javascript"></script> 
+<script src="jquery.dictionary.js" type="text/javascript"></script> 
+<script type="text/javascript"> 
+    $(function(){
+        $('#code').coder();
+    });
+</script> 
+</head> 
+<body>
+<div>示例：依次输入 html按Tab键，输入script按Tab键,输入fun按Ctrl-↓(向下方向键)，选中多行按Tab键，再按shift-Tab，其他按F1键看帮助</div>
+<textarea id="code" style="width:95%;height:600px;font:14px/18px Consolas, Monaco, 'Courier New', Courier;"></textarea> 
+</body> 
+</html> 

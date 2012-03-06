@@ -1,0 +1,22 @@
+<!--#include file="page_start.html"-->
+<dl>
+    <dt>用户登录</dt>
+    <dd>
+        <% if (error){ %><div class="alert-message error"><%=error%></div><% } %>
+        <form action="?r=admin&a=login" method="post">
+            <div class="clearfix">
+                <label>用户名：</label>
+                <input style="width:200px;" type="text" name="name" value="" /><br>
+            </div>
+            <div class="clearfix">
+                <label>密　码：</label>
+                <input style="width:200px;" type="password" name="password" value="" />
+            </div>
+            <div class="actions">
+                <input class="btn primary" type="submit" value="提交" />
+                <input type="hidden" name="url" value="<%=url%>" />
+            </div>
+        </form>
+    </dd>
+</dl>
+<!--#include file="page_end.html"-->

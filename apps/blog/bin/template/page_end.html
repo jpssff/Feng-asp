@@ -1,0 +1,72 @@
+</div>
+<div id="foot">
+    <div class="inner">
+        <div class="container">
+            &copy;<%=new Date().getFullYear()%> wifeng.cn
+            <a class="right gotop" href="#">[到顶部]</a>
+            <%if (is_login){ %>
+            <a class="right" href="?r=admin&a=logout">[退出]</a>
+            <%}else{%>
+            <a class="right" href="?r=admin&a=login">[登录]</a>
+            <% } %>
+            <br>
+            <a target="_blank" href="http://www.miibeian.gov.cn">京ICP备10027918号</a>
+        </div>
+    </div>
+</div>
+</body>
+<% if (is_login){ %>
+<script type="text/javascript">
+    window.$ && $(function(){$.tip()});
+    $(function(){
+        $('a[data-action]').click(function(){
+            var t = $(this);
+            ajaxAction(t.data('action'));
+            return false;
+        });
+    });
+</script>
+<% } %>
+<%if(is_view){%>
+<script type="text/javascript">
+    $(function(){
+        $.getScript('http://v2.jiathis.com/code/jia.js');
+    });
+</script>
+<script type="text/javascript">
+/* * * DON'T EDIT BELOW THIS LINE * * */
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<%}%>
+<script src="/static/js/prettify.js" type="text/javascript"></script>
+<script type="text/javascript">
+    $(function(){
+        $('pre').addClass('prettyprint'); 
+        prettyPrint();
+        $('form').submit(function(){
+            if(!$(this).attr('action'))
+                return false;
+        });
+        $('a.gotop').click(function(){
+            window.scroll(0,0);
+            return false;
+        });
+    });
+</script>
+<%if(F.server('SERVER_NAME')!=='localhost'){%>
+<script type="text/javascript">
+    var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+    document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Fd994a890f80a96d72425545dde882672' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<%}else{%>
+<div class="tip hidden">
+    <h2>调试信息：</h2>
+    <p>页面执行时间：<%=new Date().getTime()-START%>ms</p>
+    <p>页面缓存：<br><%F.cache.each(function(i, v){print('【'+i+'】:' + F.encodeHTML(v.slice(0,200))+'<hr>');});%></p>
+</div>
+<%}%>
+</html>

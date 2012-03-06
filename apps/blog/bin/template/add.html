@@ -1,0 +1,282 @@
+<!--#include file="page_start.html"-->
+<style type="text/css">
+    .draft_list{font-size:12px;line-height:18px;}
+    .draft_list div{white-space:nowrap;cursor:pointer;}
+    .draft_list div:hover{background:#eee;}
+    .draft_list b{display:inline-block;width:170px;}
+    .draft_btn{font-size:12px;font-weight:normal;margin-left:10px;}
+    #post_title{font-size:20px;}
+    .tags-wrap{margin:5px 0;font-size:12px;}
+    .tags-wrap label{width:auto;}
+    .tags-add-btn{margin:0.1em 0 0 0.5em;}
+    .tags-add-btn .ui-button-text{padding:0.4em 0.5em;}
+    #coder_type{margin-bottom:-1px;}
+    #coder_type .ui-button-text{padding:0.4em 0.5em;}
+    #coder_type label{width:auto;font-size:12px;border-radius:0;}
+</style>
+<dl style="position:relative;">
+    <dt>
+        <% if(is_add){ %>添加文章<%} else {%>编辑文章<% } %>
+        <% if(is_add){ %><a class="draft_btn" href="#">查看草稿</a><% } %>
+    </dt>
+    <dd>
+        <div class="as_tip" style="position:absolute;right:10px;top:5px;color:#888;font-size:12px;"></div>
+        <form action="?r=admin&a=<% if(is_add){ %>add<% }else{ %>edit&id=<%=post.id%><% } %>" method="post">
+            <div>
+                <input type="text" name="title" class="title" id="post_title" value="<% if(is_edit){ %><%=F.encodeHTML(post.title)%><%}%>" />
+            </div>
+            <div class="tags-wrap clearfix" title="请选择标签">
+                <span id="tags">
+                    <%for(var i=0; i<tags.length; i++){%>
+                    <input type="checkbox"<%if (!is_add && tags[i].id in tagids){%> checked="checked"<%}%> name="tagid" id="tagname-<%=tags[i].id%>" value="<%=tags[i].id%>" />
+                    <label for="tagname-<%=tags[i].id%>"><%=tags[i].name%></label>
+                    <%}%>
+                </span>
+                <label class="tags-add-btn" title="添加标签"><span class="ui-icon ui-icon-plusthick"></span></label>
+            </div>
+            <div class="clearfix" id="coder_type">
+                <input type="radio" id="coder_type_markdown" checked name="coder_type" value="markdown" />
+                <label for="coder_type_markdown">markdown</label>
+                <input type="radio" id="coder_type_html" name="coder_type" value="html" />
+                <label for="coder_type_html">html</label>
+            </div>
+            <div>
+                <textarea name="content" class="content" id="post_content"><% if(is_edit){ %><%=F.encodeHTML(post.content)%><%}%></textarea>
+            </div>
+            <input type="hidden" id="draft_id_input" name="draft_id" value="<%if (is_add){%><%=F.date.unixTime()%><%}else{%><%=(post.id)%><%}%>" />
+            <div style="actions">
+                <input class="btn primary" type="submit" value="提交" />
+                <input class="btn preview-btn" type="button" value="预览" />
+            </div>
+        </form>
+    </dd>
+</dl>
+<script src="/static/js/jquery.selection.js" type="text/javascript"></script>
+<script src="/static/js/jquery.coder.js" type="text/javascript"></script>
+<script src="/static/js/jquery.snippets.html.js" type="text/javascript"></script>
+<script src="/static/js/jquery.snippets.markdown.js" type="text/javascript"></script>
+<script src="/static/js/jquery.dictionary.js" type="text/javascript"></script>
+<script type="text/javascript">
+    $(function(){
+        var coder = $('.content').coder({fileType:'markdown',keyHandler: {
+            'Ctrl-S': function($this, selection){
+                as.check();
+                return false;
+            }
+        }});
+        $('#coder_type').buttonset().attr('title', '选择编辑器类型，在编辑器中按F1查看帮助');
+        $.each(['markdown', 'html'], function(i, type){
+            $('#coder_type_'+type).click(function(){
+                coder.coder({fileType:type}).focus();
+            });
+        });
+        $('.preview-btn').click(function(){
+            $.post('?r=admin&a=preview', {
+                content: $('#post_content').val()    
+            }, function(data){
+                if(data.status == 0){
+                    $.alert('<div class="adoc">'+data.content+'</div>', {
+                        width:940,
+                        modal:1
+                    });
+                }
+            }, 'json');
+        });
+        var tags = $('#tags').buttonset();
+        var tags_add_btn = $('.tags-add-btn').button();
+        tags_add_btn.click(function(){
+            $.prompt('添加标签：', '标签名', {
+                ok: function(name){
+                    $.post('?r=admin&a=tag&action=add', {
+                        name:name
+                    }, function(data){
+                        if(data.status == 0){
+                            $.tip('添加标签成功');
+                            var c = $('<input type="checkbox" checked="checked" name="tagid"/>')
+                            .attr('id', 'tagname-'+data.tag.id).attr('value', data.tag.id);
+                            var l = $('<label>').attr('for', 'tagname-'+data.tag.id)
+                            .html(data.tag.name);
+                            tags.append(c).append(l);
+                            tags.buttonset('refresh');
+                        }else{
+                            $.alert('添加失败，信息：' + data.msg);
+                        }
+                    }, 'json');
+                }
+            });
+        });
+        var as = new AutoSave({
+            url: '?r=admin&a=autosave',
+            id: <%if (is_add){%><%=F.date.unixTime()%><%}else{%><%=(post.id)%><%}%>,
+            tip: '.as_tip',
+            title: '#post_title',
+            content: '#post_content'
+        });
+        as.startTimer();
+        var draft_btn = $('.draft_btn')
+        var da = $('<div class="draft_list">');
+        draft_btn.click(function(){
+            listDraft(da, as);
+            da.dialog({
+                title:'请选择草稿', 
+                width:450, 
+                open: function(){
+                    as.clearTimer();
+                },
+                close:function(){
+                    as.startTimer();
+                }
+            });
+            return false;
+        });
+
+        <%if (draft){%>
+            $.confirm('本文有上次编辑但未发布的草稿，恢复吗？',{
+                ok: function(){
+                    var d = $(this);
+                    d.html('loading...');
+                    loadDraft(<%=draft.id%>, as, function(){
+                        d.dialog('close');
+                    });
+                },
+
+                open: function(){
+                    as.clearTimer();
+                },
+
+                close: function(){
+                    as.startTimer();
+                }
+            });
+        <%}%>
+    });
+
+    function listDraft(da, as){
+        da.html('loading...');
+        $.get('?r=admin&a=draftlist', function(data){
+            da.empty();
+            if(data.length === 0){
+                da.html('没有草稿 :)');
+                return;
+            }
+            $.each(data, function(i, d){
+                da.append($('<div>').html('<b data-id="'+d.id+'">' + d.update_time + '</b>' + d.title));
+            });
+            da.find('div').click(function(){
+                var t = $(this);
+                var id = t.find('b').attr('data-id');
+                da.html('loading...');
+                loadDraft(id, as, function(){
+                    da.dialog('close');
+                });
+            });
+        }, 'json');
+    }
+
+    function loadDraft(id, as, fn){
+        $.get('?r=admin&a=draft&id=' + id, function(data){
+            $('#post_title').val(data.title);
+            $('#post_content').val(data.content);
+            $('#draft_id_input').val(data.id);
+            fn && fn();
+            as.setId(data.id);
+        }, 'json');
+    }
+
+    function AutoSave(opt){
+        opt = opt || {};
+        this.id = opt.id;
+        this.tip = $(opt.tip);
+        this.title = $(opt.title);
+        this.content = $(opt.content);
+        this.saveUrl = opt.url;
+        this.inter = 30; //30秒
+        this.delayTime = 5; //3秒
+        this.lastTitle = this.title.val();
+        this.lastContent = this.content.val();
+        this.timer = null;
+
+        this.setId = function(id){
+            this.id = id;
+        };
+
+        this.getTimeString = function(){
+            var date = new Date();
+            return ('0' + date.getHours()).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2);
+        };
+
+        this.check = function(){
+            this.clearTimer();
+            var title = this.title.val();
+            var value = this.content.val();
+            if(value !== this.lastContent || title !== this.lastTitle){
+                this.lastTitle = title;
+                this.lastContent = value;
+                this.save();
+            }else{
+                this.heartbeat();
+                this.startTimer();
+            }
+        };
+
+        this.heartbeat = function(){
+            $.get(this.saveUrl);
+        }
+
+        this.save = function(){
+            var _this = this;
+            _this.tip.html('开始保存...');
+            $.ajax({
+                url : _this.saveUrl,
+                cache : false,
+                timeout : 10 * 1000,
+                dataType : 'json',
+                type : 'POST',
+                data : {
+                    id: _this.id,
+                    title: _this.lastTitle,
+                    content: _this.lastContent
+                },
+                success: function(data){
+                    if(data.status === 0){
+                        _this.tip.html('草稿保存成功@' + _this.getTimeString());
+                        $.tip && $.tip('草稿保存成功');
+                    }else{
+                        _this.tip.html('草稿保存失败@' + _this.getTimeString() + ',信息：' + data.msg);
+                    }
+                    window.setTimeout(function(){
+                        _this.startTimer();
+                    }, 1000 * _this.delayTime);
+                },
+                error: function(){
+                    _this.tip.html('保存时发生错误，稍候自动继续');
+                    window.setTimeout(function(){
+                        _this.save();
+                    }, 1000 * _this.delayTime);
+                }
+            });
+        };
+
+        this.update = function(delay){
+            this.tip.html(delay + '秒后保存草稿@' + this.getTimeString());
+        };
+
+        this.startTimer = function(){
+            var _this = this, t = -1;
+            window.clearInterval(this.timer);
+            this.timer = window.setInterval(function(){
+                t ++;
+                _this.update(_this.inter - t);
+                if(t >= _this.inter){
+                    _this.check();
+                }
+            }, 1000);
+        };
+
+        this.clearTimer = function(){
+            this.tip.html('zzz...');
+            window.clearInterval(this.timer);
+        };
+    }
+</script>
+<!--#include file="page_end.html"-->

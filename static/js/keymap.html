@@ -1,0 +1,78 @@
+<!DOCTYPE html> 
+<html> 
+<head><!--STATUS OK--> 
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"> 
+<title></title> 
+<script src="jquery.js" type="text/javascript"></script> 
+<script type="text/javascript"> 
+    $(function(){
+        $('#code').keydown(function(e){
+            //ctrl-shift-alt-key
+            this.value = shortcut.getActionName(e) + '\n' + e.keyCode;
+            return false;
+        });
+    });
+
+    var shortcut = (function(){
+        var specialKeys = {
+			112 : 'F1',
+			113 : 'F2',
+			114 : 'F3',
+			115 : 'F4',
+			116 : 'F5',
+			117 : 'F6',
+			118 : 'F7',
+			119 : 'F8',
+			120 : 'F9',
+			121 : 'F10',
+			122 : 'F11',
+			123 : 'F12',
+			13  : 'Enter',
+			144 : 'Num',
+			144 : 'Numlock',
+			145 : 'Scrolllock',
+			187 : 'Plus',
+			189 : 'Minus',
+			19  : 'Break',
+			19  : 'Pause',
+			20  : 'Caps',
+			20  : 'Capslock',
+			27  : 'Esc',
+			32  : 'Space',
+			33  : 'Pageup',
+			34  : 'Pagedown',
+			35  : 'End',
+			36  : 'Home',
+			37  : 'Left',
+			38  : 'Up',
+			39  : 'Right',
+			40  : 'Down',
+			45  : 'Insert',
+			46  : 'Delete',
+			8   : 'Backspace',
+			9   : 'Tab'
+		};
+
+        return {
+            getActionName: function(e){
+                var map = [];
+                e.ctrlKey && (map.push('Ctrl'));
+                e.shiftKey && (map.push('Shift'));
+                e.altKey && (map.push('Alt'));
+                if(e.keyCode > 64 && e.keyCode < 91){
+                    map.push(String.fromCharCode(e.keyCode));
+                }else if(e.keyCode in specialKeys){
+                    map.push(specialKeys[e.keyCode]);
+                }
+                return map.join('-');
+            }
+        };
+        
+    })();
+</script> 
+</head> 
+<body>
+<textarea id="code" style="width:95%;height:600px;font:14px/18px Consolas, Monaco, 'Courier New', Courier;"></textarea> 
+</body> 
+</html> 
+
