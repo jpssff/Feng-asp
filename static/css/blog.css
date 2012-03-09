@@ -11,7 +11,7 @@ dl dt{line-height:35px;font-size:18px;padding-left:10px;color:#2F305F;
     filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#cccccc', endColorstr='#ffffff'); 
 }
 dl dd{border-top:none;padding:0 10px 10px 10px;line-height:1.6em;margin:0;}
-dl dd pre{border:1px solid silver;padding:3px;margin:5px 0;color:#100;
+dl dd pre{border:1px solid silver;padding:9px;margin:5px 0;color:#100;
     background:#f9f9f9;font:12px/18px  Consolas, 'Courier New';
     white-space: pre-wrap;white-space: -moz-pre-wrap;white-space:-pre-wrap;
     white-space: -o-pre-wrap;word-wrap: break-word;}
