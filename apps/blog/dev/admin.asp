@@ -3,7 +3,7 @@
 bind('admin', {
     _init: function(){
         getController('blog')._init();
-        if(ACTION !== 'login'){
+        if(F.get('a') !== 'login'){
             if(!F.User.isLogin()){
                 F.go('?r=admin&a=login');
             }
@@ -21,7 +21,7 @@ bind('admin', {
         F.go('?r=blog');
     },
 
-    login: function(){
+    login: function(q, p){
         assign('error', '');
         if(F.isGet()){
             var url = '?r=blog';
@@ -33,15 +33,21 @@ bind('admin', {
             assign('page_title', '用户登录');
             display('bin/template/login.html');
         }else{
-            var name = F.post('name');
-            var password = F.post('password');
-            var url = F.post('url') || '?r=blog';
+            var name = p.name;
+            var password = p.password;
+            var url = p.url || '?r=blog';
             assign('url', url);
+            var isRemember = p.remember == 'on';
             if(name !== "" && password !== ""){
                 var db = this._db();
                 var user = new F.User();
                 if(user.checkLogin(name, password, true)){
                     db.close();
+                    if (isRemember) {
+                        var exprire =new Date(new Date().getTime()+1000*3600*24*30); 
+                        F.cookie.set('password', F.md5(password), exprire);
+                        F.cookie.set('name', name, exprire);
+                    };
                     F.go(url);
                 }
                 db.close();
@@ -54,6 +60,8 @@ bind('admin', {
     logout: function(){
         if(F.User.isLogin()){
             F.User.logout();
+            F.cookie.remove('name');
+            F.cookie.remove('password');
         }
         F.go('?r=blog');
     },

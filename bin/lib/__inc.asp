@@ -111,14 +111,16 @@ var getController = function(ctrl){
 };
 
 var run = function(){
+    var q = F.get();
+    var p = F.post();
     var controllers = F._controllers || (F._controllers = {});
-    var ctrl = F.get('r') || 'site';
-    var action = F.get('a') || 'index';
+    var ctrl = q.r || 'site';
+    var action = q.a || 'index';
     var fn = function(){
         if('_init' in controllers[ctrl]){
-            controllers[ctrl]._init();
+            controllers[ctrl]._init(q, p);
         }
-        controllers[ctrl][action]();
+        controllers[ctrl][action](q, p);
     };
     if(ctrl in controllers){
         if(action in controllers[ctrl] && action.substring(0,1) !== '_'){

@@ -39,7 +39,19 @@ bind('blog',{
 
     _init: function(){
         var ACTION = F.get('a') || 'index';
-        assign('is_login', F.User.isLogin());
+        var isLogin = F.User.isLogin();
+        if (!isLogin) {
+            var name = F.cookie.get('name');
+            var password = F.cookie.get('password');
+            if (name && password) {
+                var db = this._db();
+                var user = new F.User();
+                if (user.checkLogin(name, password)) {
+                    isLogin = true;
+                };
+            };
+        };
+        assign('is_login', isLogin);
         assign('is_loginpage', ACTION === 'login');
         assign('is_home', ACTION === 'index');
         assign('is_view', ACTION === 'view');

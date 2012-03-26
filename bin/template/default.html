@@ -1,18 +1,24 @@
 <!--#include file="page_start.html"-->
 <style type="text/css">
-    .apps li a{margin-right:10px;}
+    .apps td a{margin-right:10px;}
 </style>
 <dl>
-    <dt>APP列表</dt>
+    <dt>Projects</dt>
     <dd class="apps">
-        <ul>
+        <table>
             <%apps.forEach(function(app, i){%>
-            <li>
-                <a href="apps/<%=app%>/dev.asp"><%=app%></a>
-                <a href="?a=build&app=<%=app%>">编译</a>
-            </li>
+            <tr>
+                <td width="25"><%=i+1%></td>
+                <td>
+                    <a href="apps/<%=app%>/dev.asp">[<%=app%>]</a>
+                </td>
+                <td>
+                    <a href="apps/<%=app%>/dev.asp">Preview</a>
+                    <a href="?a=build&app=<%=app%>">Compile</a>
+                </td>
+            </tr>
             <%});%>
-        </ul>
+        </table>
     </dd>
 </dl>
 <dl>

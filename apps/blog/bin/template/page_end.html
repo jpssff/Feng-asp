@@ -63,7 +63,7 @@
     document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Fd994a890f80a96d72425545dde882672' type='text/javascript'%3E%3C/script%3E"));
 </script>
 <%}else{%>
-<div class="tip hidden">
+<div class="tip">
     <h2>调试信息：</h2>
     <p>页面执行时间：<%=new Date().getTime()-START%>ms</p>
     <p>页面缓存：<br><%F.cache.each(function(i, v){print('【'+i+'】:' + F.encodeHTML(v.slice(0,200))+'<hr>');});%></p>

@@ -111,7 +111,7 @@ F.User.isLogin = function(){
 };
 
 F.User.logout = function(){
-    F.session.remove('f_user_login_ok');
+    F.session.remove('F_User_login_ok');
 }
 
 
