@@ -26,7 +26,7 @@ var DEBUG_MODE = true;
 <!--#include file="F.Upload.asp"-->
 <!--#include file="F.User.asp"-->
 <!--#include file="F.Xml.asp"-->
-<!--#include file="F.Zip.asp"-->
+<!--#include file="F.Binary.asp"-->
 <%
 
 var echo = function(){

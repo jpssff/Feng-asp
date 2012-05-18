@@ -1,5 +1,8 @@
 <%
 //xml操作类
+//可以抓取xml并自动判断编码
+//可以转成json格式
+
 F.Xml = function(input){
     this.input = input;
     this.xml = null;
@@ -9,13 +12,52 @@ F.Xml = function(input){
         this.xml = input.xml;
     }else if(F.isString(input)){
         this.xml = input;
-        this.obj = F.Xml.parseXMLString(input);
+        this.obj = F.Xml.fromString(input);
     }
 };
 
 F.Xml.prototype = {
-    toJson: function(node){
-        return F.Xml.parseXMLNode(node || this.obj);
+    toJson: function(){
+        //return F.Xml.parseXMLNode(node || this.obj);
+
+        // Create the return object
+        var xml = this.obj;
+        var obj = {};
+        if (xml.nodeType == 1) { // element
+            // do attributes
+            if (xml.attributes.length > 0) {
+                obj["@attributes"] = {};
+                for (var j = 0; j < xml.attributes.length; j++) {
+                    var attribute = xml.attributes.item(j);
+                    obj["@attributes"][attribute.nodeName] = attribute.nodeValue;
+                }
+            }
+        } else if (xml.nodeType == 3) { // text
+            obj = xml.nodeValue;
+        }
+
+        // do children
+        if (xml.childNodes) {
+            for(var i = 0; i < xml.childNodes.length; i++) {
+                var item = xml.childNodes.item(i);
+                var nodeName = item.nodeName;
+                if (typeof(obj[nodeName]) == "undefined") {
+                    if (nodeName === '#cdata-section' || nodeName === '#text') {
+                        obj = item.nodeValue;
+                    }else{
+                        obj[nodeName] = new F.Xml(item).toJson();
+                    }
+                } else {
+                    if (typeof(obj[nodeName].length) == "undefined") {
+                        var old = obj[nodeName];
+                        obj[nodeName] = [];
+                        obj[nodeName].push(old);
+                    }
+                    obj[nodeName].push(new F.Xml(item).toJson());
+                }
+            }
+        }
+        return obj;
     },
 
     load: function(url){
@@ -32,53 +74,7 @@ F.Xml.prototype = {
     }
 };
 
-F.Xml.parseXMLNode = function(node) {
-    var obj = {};
-    var element = node.firstChild;
-    while (element) {
-        if (element.nodeType === 1) {
-            var name = element.nodeName;
-            var sub = F.Xml.parseXMLNode(element)
-            sub.nodeValue = "";
-            sub.xml = element.xml;
-            sub.toString = function() { return this.nodeValue; };
-            sub.toXMLString = function() { return this.xml; }
-            // get attributes
-            if (element.attributes) {
-                for (var i=0; i<element.attributes.length; i++) {
-                    var attribute = element.attributes[i];
-                    sub[attribute.nodeName] = attribute.nodeValue;
-                }
-            }
-            // get nodeValue
-            if (element.firstChild) {
-                var nodeType = element.firstChild.nodeType;
-                if (nodeType === 3 || nodeType === 4) {
-                    sub.nodeValue = element.firstChild.nodeValue;
-                }
-            }
-            // node already exists?
-            if (obj[name]) {
-                // need to create array?
-                if (!obj[name].length) {
-                    var temp = obj[name];
-                    obj[name] = [];
-                    obj[name].push(temp);
-                }
-                // append object to array
-                obj[name].push(sub);
-            } else {
-                // create object
-                obj[name] = sub;
-            }
-        }
-        element = element.nextSibling;
-    }
-    return obj;
-};
-
-
-F.Xml.parseXMLString = function(xml) {
+F.Xml.fromString = function(xml) {
     var obj = {};
     var xmlDOM = new ActiveXObject("Microsoft.XMLDOM");
     xmlDOM.async = false;
@@ -93,9 +89,6 @@ F.Xml.parseXMLString = function(xml) {
     xmlDOM = null;
     return obj;
 };
-
-
-
 
 // vim:ft=javascript
 %>

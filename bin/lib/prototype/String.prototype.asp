@@ -13,7 +13,7 @@ if (!String.prototype.trim) {
 };
 
 String.prototype.nl2br = function(){
-    return this.replace(/\n/g, '<br>');
+    return this.replace(/\n/g, '<br/>');
 };
 
 // vim:ft=javascript

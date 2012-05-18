@@ -1,36 +1,62 @@
 <%
 F.namespace('F.ajax');
 
-F.ajax.load = function(method, url, fn, type, data){
-    var http = xml_http();
+F.ajax.request = function(option){
+    option = F.extend({
+        method:'GET',
+        success: function(){},
+        fail: function(){},
+        dataType: 'text',
+        charset: 'utf-8'
+    }, option);
+    var http = F.http(true);
     http.onreadystatechange = function(){
-        if(http.readyState == 4 && http.status === 200){
-            var types = {
-                'xml' : 'responseXML',
-                'text' : 'responseText',
-                'body' : 'responseBody',
-                'stream' : 'responseStream'
-            };
-            type = type || 'text';
-            fn(http[types[type]]);
+        if(http.readyState == 4){
+            if (http.status === 200) {
+                var types = {
+                    'xml' : 'responseXML',
+                    'text' : 'responseText',
+                    'body' : 'responseBody',
+                    'stream' : 'responseStream'
+                };
+                if (option.dataType == 'xml') {
+                    var charset = option.charset;
+                    var ss = http.responseText.match(/encoding="([a-zA-Z\-0-9]+)"/);
+                    if(ss.length > 1){
+                        charset = ss[1];
+                    }
+                    var body = http.responseBody;
+                    var str = new F.Binary(body).toString(charset);
+                    option.success(F.Xml.fromString(str));
+                }else{
+                    option.success(http[types[option.dataType]]);
+                }
+            }else{
+                option.fail(http.status);
+            }
             http = null;
         }
     }
-    http.open(method, url, false);
-    http.send(data ? data : null);
+    http.open(option.method, option.url, false);
+    http.send(option.data || null);
+};
 
-    function xml_http(){
-        var xv = [".6.0", ".5.0", ".4.0", ".3.0", ".2.6", ""];
-        for (var i = 0; i < xv.length; i++) {
-            try {
-                return new ActiveXObject("msxml2.xmlHttp" + xv[i]);
-            } catch (ex) { }
-        }
-    }
+F.ajax.load = function(method, url, fn, type, data){
+    F.ajax.request({
+        method:method,
+        url:url,
+        success:fn, 
+        dataType:type,
+        data:data
+    });
 };
 
 F.ajax.get= function(url, fn, type){
-    F.ajax.load('GET', url, fn, type);
+    F.ajax.request({
+        url:url,
+        success:fn, 
+        dataType:type
+    });
 };
 
 

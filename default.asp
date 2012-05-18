@@ -1,26 +1,5 @@
 ﻿<!--#include file="bin/lib/__inc.asp"-->
 <%
-function startTrace(){
-    if (Function.__fs) {
-        return;
-    };
-    var fs = Function.__fs = [];
-    var rec = function(c){
-        if (c !== rec) {
-            fs.push(c);
-        };
-    };
-    var p = Function.prototype;
-    var c = p._constructor = p.constructor;
-    var nc = function(){
-        rec(c);
-        c.apply(this, arguments);
-    };
-    p.constructor = function(){
-        log('xxxx');
-    };
-}
-
 bind({
     'index': function(q){
         F.cache.remove();

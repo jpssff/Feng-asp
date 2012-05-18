@@ -329,14 +329,17 @@ if (!JSON) {
 
 // Otherwise, iterate through all of the keys in the object.
 
-                for (k in value) {
-                    if (Object.prototype.hasOwnProperty.call(value, k)) {
-                        v = str(k, value);
-                        if (v) {
-                            partial.push(quote(k) + (gap ? ': ' : ':') + v);
+                //在遍历一些宿主对象时，asp会报错，这里try一下。
+                try{
+                    for (k in value) {
+                        if (Object.prototype.hasOwnProperty.call(value, k)) {
+                            v = str(k, value);
+                            if (v) {
+                                partial.push(quote(k) + (gap ? ': ' : ':') + v);
+                            }
                         }
                     }
-                }
+                }catch(e){}
             }
 
 // Join all of the member texts together, separated with commas,

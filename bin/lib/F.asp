@@ -248,18 +248,30 @@ F.execute = function(path){
         debug(arguments, e);
     }
 };
+
+
+(function(){
 %>
-<%(function(){%>
 <!--#include file="thirdparty/bs.asp"-->
 <%
 F.bs = BS;
 })();
 
-//获得fso组件
-F.__fso = null;
-F.fso = function(){
-    return F.__fso || (F.__fso = new ActiveXObject('Scripting.FileSystemObject'));
-};
+//生成获取ActiveXObject的方法
+(function(){
+    var ax = {
+        'fso' : 'Scripting.FileSystemObject',
+        'xml' : 'Microsoft.XMLDOM',
+        'stream' : 'ADODB.Stream',
+        'http' : 'Microsoft.XMLHTTP'
+    };
+    var cache = {};
+    Object.keys(ax).forEach(function(v){
+        F[v] = function(isnew){
+            return isnew ? new ActiveXObject(ax[v]) : (cache[v] || (cache[v] = new ActiveXObject(ax[v])));
+        };
+    });
+})();
 
 //处理include模板
 F.includeAll = function(path){
