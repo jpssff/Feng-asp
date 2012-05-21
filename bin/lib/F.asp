@@ -134,6 +134,24 @@ F.desc = function(){
     return style + html.join('');
 };
 
+///////// 常用函数 ////////
+F.parseHeaders = function(data) {
+    var obj = {};
+    data.split(/[\r\n]+/).each(function(i,str){
+        str.replace(/^([^:]+):\s*(.*)$/,function(_,key,val){
+            if (Object.exists(obj, key)) {
+                if (Object.vartype(obj[key]) != 'array') {
+                    obj[key] = [obj[key]];
+                }
+                obj[key].push(val);
+            } else {
+                obj[key] = val;
+            }
+        });
+    });
+    return obj;
+};
+
 ////////  asp ////////
 
 //获取url参数
@@ -211,11 +229,11 @@ F.guid = function(){
 
 //进行html转意
 F.encodeHTML = function(text){
-	return String(text).replace(/&/g,'&amp;')
-	    .replace(/</g,'&lt;')
-		.replace(/>/g,'&gt;')
-		.replace(/"/g, "&quot;")
-		.replace(/'/g, "&#39;");
+    return String(text).replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 };
 
 //url转向
@@ -251,10 +269,10 @@ F.execute = function(path){
 
 
 (function(){
-%>
-<!--#include file="thirdparty/bs.asp"-->
-<%
-F.bs = BS;
+    %>
+    <!--#include file="thirdparty/bs.asp"-->
+    <%
+    F.bs = BS;
 })();
 
 //生成获取ActiveXObject的方法
@@ -342,26 +360,26 @@ F.fetch = function(path, data, opt){
             interpolate : new RegExp('<' + '%=([\\s\\S]+?)%'+ '>', 'g')
         };
         tmpl = 'var __x=[],print=function(){__x.push.apply(__x,arguments);};' +
-          'with(obj||{}){__x.push(\'' +
-          str.replace(/\\/g, '\\\\')
-             .replace(/'/g, "\\'")
-             .replace(c.interpolate, function(match, code) {
-               return "'," + code.replace(/\\'/g, "'") + ",'";
-             })
-             .replace(c.evaluate || null, function(match, code) {
-               return "');" + code.replace(/\\'/g, "'")
-                                  .replace(/[\r\n\t]/g, ' ') + "__x.push('";
-             })
-             .replace(/\r/g, '\\r')
-             .replace(/\n/g, '\\n')
-             .replace(/\t/g, '\\t')
-             + "');}return __x.join('');";
-        var t = {}, f = new F.File();
-        tp.paths.forEach(function(p){
-            t[p] = f.setPath(p).getDateLastModified().getTime();
-        });
-        F.cache.set(tkey, F.json.stringify(t));
-        F.cache.set(key, tmpl);
+        'with(obj||{}){__x.push(\'' +
+            str.replace(/\\/g, '\\\\')
+            .replace(/'/g, "\\'")
+            .replace(c.interpolate, function(match, code) {
+                return "'," + code.replace(/\\'/g, "'") + ",'";
+            })
+        .replace(c.evaluate || null, function(match, code) {
+            return "');" + code.replace(/\\'/g, "'")
+            .replace(/[\r\n\t]/g, ' ') + "__x.push('";
+                })
+                .replace(/\r/g, '\\r')
+            .replace(/\n/g, '\\n')
+            .replace(/\t/g, '\\t')
+            + "');}return __x.join('');";
+            var t = {}, f = new F.File();
+            tp.paths.forEach(function(p){
+                t[p] = f.setPath(p).getDateLastModified().getTime();
+            });
+            F.cache.set(tkey, F.json.stringify(t));
+            F.cache.set(key, tmpl);
     }
     return data ? (function(){
         var html = '';
@@ -377,15 +395,15 @@ F.fetch = function(path, data, opt){
 
 %>
 <%(function(){%>
-<!--#include file="thirdparty/jsmin.asp"-->
-<%
-F.jsmin = jsmin;
+    <!--#include file="thirdparty/jsmin.asp"-->
+    <%
+    F.jsmin = jsmin;
 })();
 %>
 <%(function(){%>
-<!--#include file="thirdparty/jsbeautify.asp"-->
-<%
-F.formatJSON = js_beautify;
+    <!--#include file="thirdparty/jsbeautify.asp"-->
+    <%
+    F.formatJSON = js_beautify;
 })();
 
 

@@ -1,4 +1,11 @@
 <%
+Array.prototype.each = function(fn) {
+    var arr = this, len = arr.length;
+    for (var i = 0; i < len; i++) {
+        if (fn.call(arr, i, arr[i]) === false) break;
+    }
+    return arr;
+};
 
 // https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/every
 if (!Array.prototype.every) {

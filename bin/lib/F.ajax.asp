@@ -28,6 +28,21 @@ F.ajax.request = function(option){
                     var body = http.responseBody;
                     var str = new F.Binary(body).toString(charset);
                     option.success(F.Xml.fromString(str));
+                }else if(option.dataType == 'text'){
+                    var headers = F.parseHeaders(http.getAllResponseHeaders());
+                    if (headers['Content-Type']) {
+                        var charset = 'utf-8';
+                        var text;
+                        try{
+                            var ss = headers['Content-Type'].split('set=');
+                            text = http.responseText;
+                            if (ss.length == 2) {
+                                charset = ss[1];
+                            };
+                        }catch(e){}
+                        text = new F.Binary(http.responseBody).toString(charset);
+                        option.success(text);
+                    };
                 }else{
                     option.success(http[types[option.dataType]]);
                 }
