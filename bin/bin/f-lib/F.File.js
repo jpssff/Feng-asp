@@ -277,7 +277,7 @@ F.File.prototype = {
         s.CharSet = charset || 'utf-8';
         s.Open();
         s.LoadFromFile(this.path);
-        s.Position = start;
+        s.Position = start > s.Size ? s.Size : start;
         str = s.ReadText(charCount);
         pos = s.Position;
         s.Close();
