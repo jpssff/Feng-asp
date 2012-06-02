@@ -13,7 +13,7 @@
 <%if (DEBUG_MODE){%>
 <div class="tip">
     <h2>调试信息：</h2>
-    <p>页面执行时间：<%=new Date().getTime()-START%>ms</p>
+    <p>页面执行时间：<%=new Date().getTime()-__date%>ms</p>
     <pre>页面缓存：<br><%F.cache.each(function(i, v){print('【'+i+'】:' + F.encodeHTML(F.formatJSON(v.slice(0,200)))+'<hr>');});%></pre>
 </div>
 <%}%>
