@@ -1,0 +1,4 @@
+<%@LANGUAGE="JAVASCRIPT" CODEPAGE="65001"%>
+<script runat="server" language="javascript" src="util.js"></script>
+<script runat="server" language="javascript" src="app.js"></script>
+<!--#include file="f-lib/__inc.xml"-->
